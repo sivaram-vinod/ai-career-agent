@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>AI Career Assistant</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="data:,">
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="card">
+            <h1>AI Career Assistant</h1>
+            <p class="subtitle">
+                Get AI-powered career guidance, a learning roadmap, and resume points.
+            </p>
+
+            <div class="form-group">
+                <label>Skills</label>
+                <textarea id="skills" placeholder="e.g. Python, problem solving"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Interests</label>
+                <textarea id="interests" placeholder="e.g. AI, software development"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Education</label>
+                <textarea id="education" placeholder="e.g. Computer science student"></textarea>
+            </div>
+
+            <button id="analyzeBtn" onclick="analyzeCareer()">Analyze Career</button>
+
+            <p id="loading">Analyzing your profile...</p>
+            <p id="error"></p>
+        </div>
+
+        <div id="result" class="card result-card">
+            <div class="result-section">
+                <h3>Career Paths</h3>
+                <p id="career"></p>
+            </div>
+
+            <div class="result-section">
+                <h3>Learning Roadmap</h3>
+                <p id="roadmap"></p>
+            </div>
+
+            <div class="result-section">
+                <h3>Resume Points</h3>
+                <ul id="resume"></ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
