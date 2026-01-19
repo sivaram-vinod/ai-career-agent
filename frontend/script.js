@@ -19,36 +19,44 @@ async function analyzeCareer() {
     loading.style.display = "block";
     button.disabled = true;
 
-    try {
-        const response = await fetch(
-            "https://ai-career-agent-backend.onrender.com/analyze",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ skills, interests, education })
+    async function callBackend(retry = false) {
+        try {
+            const response = await fetch(
+                "https://ai-career-agent-backend.onrender.com/analyze",
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ skills, interests, education })
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error("Backend not ready");
             }
-        );
 
-        if (!response.ok) {
-            const text = await response.text();
-            throw new Error(text);
+            return await response.json();
+        } catch (err) {
+            if (!retry) {
+                // Retry once after backend wakes up
+                await new Promise(res => setTimeout(res, 2000));
+                return callBackend(true);
+            }
+            throw err;
         }
+    }
 
-        const data = await response.json();
+    try {
+        const data = await callBackend();
 
-        /* ---------------- Career Paths ---------------- */
+        /* -------- Career Paths -------- */
         let careerPaths = data.career_paths;
         if (typeof careerPaths === "string") {
             careerPaths = JSON.parse(careerPaths);
         }
         document.getElementById("career").innerText =
-            Array.isArray(careerPaths)
-                ? careerPaths.join(", ")
-                : careerPaths;
+            Array.isArray(careerPaths) ? careerPaths.join(", ") : careerPaths;
 
-        /* ---------------- Learning Roadmap ---------------- */
+        /* -------- Learning Roadmap -------- */
         let roadmap = data.learning_roadmap;
         if (typeof roadmap === "string") {
             try {
@@ -58,11 +66,9 @@ async function analyzeCareer() {
             } catch {
                 document.getElementById("roadmap").innerText = roadmap;
             }
-        } else {
-            document.getElementById("roadmap").innerText = roadmap;
         }
 
-        /* ---------------- Resume Points ---------------- */
+        /* -------- Resume Points -------- */
         const resumeList = document.getElementById("resume");
         resumeList.innerHTML = "";
 
@@ -81,8 +87,9 @@ async function analyzeCareer() {
         resultCard.scrollIntoView({ behavior: "smooth" });
 
     } catch (err) {
-        console.error("Frontend error:", err);
-        error.innerText = "Something went wrong. Please try again.";
+        console.error("Final frontend error:", err);
+        error.innerText =
+            "Server is waking up. Please click Analyze again in a moment.";
     }
 
     loading.style.display = "none";
