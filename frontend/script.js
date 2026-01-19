@@ -1,3 +1,13 @@
+// Warm up backend on page load (Render free tier fix)
+window.addEventListener("load", async () => {
+    try {
+        await fetch("https://ai-career-agent-backend.onrender.com/docs");
+        console.log("Backend warmed up");
+    } catch (e) {
+        console.log("Backend warmup failed (will retry on submit)");
+    }
+});
+
 async function analyzeCareer() {
     const skills = document.getElementById("skills").value.trim();
     const interests = document.getElementById("interests").value.trim();
