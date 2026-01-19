@@ -32,19 +32,40 @@ async function analyzeCareer() {
         );
 
         if (!response.ok) {
-            throw new Error("Server error");
+            const text = await response.text();
+            throw new Error(text);
         }
 
         const data = await response.json();
 
-        // Populate results
-        document.getElementById("career").innerText = data.career_paths;
-        document.getElementById("roadmap").innerText = data.learning_roadmap;
+        /* ---------------- Career Paths ---------------- */
+        let careerPaths = data.career_paths;
+        if (typeof careerPaths === "string") {
+            careerPaths = JSON.parse(careerPaths);
+        }
+        document.getElementById("career").innerText =
+            Array.isArray(careerPaths)
+                ? careerPaths.join(", ")
+                : careerPaths;
 
+        /* ---------------- Learning Roadmap ---------------- */
+        let roadmap = data.learning_roadmap;
+        if (typeof roadmap === "string") {
+            try {
+                roadmap = JSON.parse(roadmap);
+                document.getElementById("roadmap").innerText =
+                    Object.values(roadmap).join("\n");
+            } catch {
+                document.getElementById("roadmap").innerText = roadmap;
+            }
+        } else {
+            document.getElementById("roadmap").innerText = roadmap;
+        }
+
+        /* ---------------- Resume Points ---------------- */
         const resumeList = document.getElementById("resume");
         resumeList.innerHTML = "";
 
-        // Handle resume_points as string or array
         let resumePoints = data.resume_points;
         if (typeof resumePoints === "string") {
             resumePoints = JSON.parse(resumePoints);
@@ -52,11 +73,10 @@ async function analyzeCareer() {
 
         resumePoints.forEach(point => {
             const li = document.createElement("li");
-            li.innerText = point;
+            li.innerText = point.trim();
             resumeList.appendChild(li);
         });
 
-        // Show result card and scroll smoothly
         resultCard.style.display = "block";
         resultCard.scrollIntoView({ behavior: "smooth" });
 
